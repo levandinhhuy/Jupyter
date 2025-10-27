@@ -1,30 +1,32 @@
 # Solve the following MIP:
 #  maximize
-#        x +   y + 2 z
+#        12 x + 14 y
 #  subject to
-#        x + 2 y + 3 z <= 4
-#        x +   y       >= 1
-#        x, y, z binary
+#        1.5 x + 2 y <= 18
+#        12 x + 10 y <= 120
+#        x, y >= 0 && x, y are integers
 
-import ilp as gp
+import gurobipy as gp
+from gurobipy import GRB
 
-# Create a new model
-m = gp.Model()
+# Tạo model
+m = gp.Model("mip_example")
 
-# Create variables
-x = m.addVar(vtype='B', name="x")
-y = m.addVar(vtype='B', name="y")
-z = m.addVar(vtype='B', name="z")
+# Tạo biến nguyên không âm
+x = m.addVar(vtype=GRB.INTEGER, name="x")
+y = m.addVar(vtype=GRB.INTEGER, name="y")
 
-# Set objective function
-m.setObjective(x + y + 2 * z, gp.GRB.MAXIMIZE)
+# Đặt hàm mục tiêu: maximize 12x + 14y
+m.setObjective(12 * x + 14 * y, GRB.MAXIMIZE)
 
-# Add constraints
-m.addConstr(x + 2 * y + 3 * z <= 4)
-m.addConstr(x + y >= 1)
+# Thêm ràng buộc
+m.addConstr(1.5 * x + 2 * y <= 18, name="c1")
+m.addConstr(12 * x + 10 * y <= 120, name="c2")
 
-# Solve it!
+# Giải mô hình
 m.optimize()
 
-print(f"Optimal objective value: {m.objVal}")
-print(f"Solution values: x={x.X}, y={y.X}, z={z.X}")
+# In kết quả
+if m.status == GRB.OPTIMAL:
+    print(f"Optimal objective value: {m.objVal}")
+    print(f"x = {x.X}, y = {y.X}")
